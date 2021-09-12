@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 const fetchuser = require('../middleware/fetchuser')
 const SECRET_KEY = "thisismyfirstbigproject";
 
-// ROUTE 1: create users using POST "/api/auth/createUsers"   --no login required
-router.post('/createUser',[             // this function takes 3 parameters [ PATH, VALIDATOR, CALLBACK FUNCTION]
+// ROUTE 1: create users using POST "/api/auth/createusers"   --no login required
+router.post('/createuser',[             // this function takes 3 parameters [ PATH, VALIDATOR, CALLBACK FUNCTION]
     body('name','field length must be  greater than 3 characters').isLength({ min: 3 }), // body keyword is exported from express validator
     body('email','enter a valid email').isEmail(),                                       //  this snippet is used to validate 
     body('password','field length must be greater than 7 characters').isLength({min:7})//  input submitted by the user
@@ -59,8 +59,8 @@ router.post('/createUser',[             // this function takes 3 parameters [ PA
 
 
 
-// ROUTE 2: authenticate users using POST "/api/auth/loginUsers"   --no login required
-router.post('/loginUser',[                // router.post("PATH","VALIDATOR",CALLBACK) 
+// ROUTE 2: authenticate users using POST "/api/auth/loginusers"   --no login required
+router.post('/loginuser',[                // router.post("PATH","VALIDATOR",CALLBACK) 
       body('email','Enter a valid email').isEmail(), // body keyword is exported from express validator
       body('password','field length must be greater than 7 characters').isLength({min:7})
       ], async (req, res)=>{
@@ -106,7 +106,7 @@ router.post('/loginUser',[                // router.post("PATH","VALIDATOR",CALL
       } )
 
 
-// ROUTE 3: get loggedIN users details using POST "/api/auth/getUser"   --Login required
+// ROUTE 3: get loggedIN users details using POST "/api/auth/getuser"   --Login required
 // SUMMARY:
 // we are first checking if the JWt token in the request header is authenticate or not using a middleware
 // in the middleware using JWT.verify we are authenticating as well as decoding the data( USER ID ) in the token
@@ -114,9 +114,10 @@ router.post('/loginUser',[                // router.post("PATH","VALIDATOR",CALL
 // after we get the USERID then we search our DB for it and return the user data
 
 // this function takes 3 parameters [ PATH, VALIDATOR, CALLBACK FUNCTION]
-router.post('/getUser', fetchuser, async (req,res)=>{
+router.post('/getuser', fetchuser, async (req,res)=>{
   try {
     const userId = req.user.id;
+    //console.log(req.user.id);
     const user = await User.findById(userId).select("-password")
     res.send(user)
   } catch (err) {

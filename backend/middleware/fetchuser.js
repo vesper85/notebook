@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = "thisismyfirstbigproject";
 
-
+// return type is a json with USERID
 const fetchuser = (req,res, next)=>{
     const JWTtoken = req.header('auth-token');
     if(!JWTtoken)
@@ -10,6 +10,7 @@ const fetchuser = (req,res, next)=>{
     }
     try {
         const data = jwt.verify(JWTtoken,SECRET_KEY);
+        //console.log(data);
         req.user = data.user;
         next()
     } catch (err) {
