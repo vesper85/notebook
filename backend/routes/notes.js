@@ -57,4 +57,65 @@ router.post(
   }
 );
 
+
+
+// ROUTE 3: update a existing note GET "/api/notes/updatenote"   --login required
+// the id than is forwaded through endpoint ie."/update/:id" here id refers to the id of the note 
+// and not of the user that is stored in the notes object
+router.put('/updatenote/:id',fetchuser,[
+    body('title', 'Empty fields not allowed').isLength({min:1}),
+    body('description', 'Empty fields not allowed').isLength({ min: 3 }),
+],async (req,res)=>{
+    const {title, description, tag} = req.body;
+    //create a new note
+    const newNote = {};
+    if(title){ newNote.title = title};
+    if(description){ newNote.description = description};
+    if(tag){ newNote.tag = tag};
+
+    // find the note to be update and update it
+    let note = await Notes.findById(req.params.id)
+    if(!note){ return res.status(400).send('Not Found')}
+    
+     // To check if the request is comming from user who is the owner of the note
+    // compare the userid stored in the note object to the userid we get from the JSON token
+    if(note.user.toString() !== req.user.id ){
+        return res.status(400).send("Not Found")
+    }
+    // to update the note we need to use findIdAndUpdate with the id of the note and not that of the user
+    note = await Notes.findByIdAndUpdate(req.params.id,{$set: newNote},{ new:true})
+    res.json(note)
+})
+
+
+
+// ROUTE 4: delete a existing note GET "/api/notes/deletenote"   --login required
+router.put('/deletenote/:id',fetchuser,async (req,res)=>{
+
+   
+    try {
+         // find the note to be deleted using the id of the note that is passed throught the path of the api
+    let note =await Notes.findById(req.params.id)
+
+    // display the error if the note doesnot exists
+    if(!note){ return res.status(404).send('Not Found')}
+
+    // To check if the request is comming from user who is the owner of the note
+    // compare the userid stored in the note object to the userid we get from the JSON token
+    if(note.user.toString() !== req.user.id )
+    {
+        return res.status(401).send("Not Found")
+    }
+    let delnote = await Notes.findByIdAndDelete(req.params.id)
+    res.json({"sucess":'sucess the note has been deleted', delnote:delnote})
+        
+    } catch (err) {
+        console.error(err.message)
+        res.send(err)
+    }
+
+
+})
+
+
 module.exports = router;
