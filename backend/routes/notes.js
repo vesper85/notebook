@@ -50,7 +50,7 @@ router.post(
         tag: tag,
       });
       const savednote = await note.save()
-      res.json(savednote)
+      res.send(savednote)
     } catch (error) {
       res.status(500).send('error in trycatch block');
     }
@@ -83,6 +83,7 @@ router.put('/updatenote/:id',fetchuser,[
         return res.status(400).send("Not Found")
     }
     // to update the note we need to use findIdAndUpdate with the id of the note and not that of the user
+    // findByIdAndUpdate ( note_id, dataToBeUpdated, new:true (if note doesnot exit it will create a new note) )
     note = await Notes.findByIdAndUpdate(req.params.id,{$set: newNote},{ new:true})
     res.json(note)
 })
@@ -90,7 +91,7 @@ router.put('/updatenote/:id',fetchuser,[
 
 
 // ROUTE 4: delete a existing note GET "/api/notes/deletenote"   --login required
-router.put('/deletenote/:id',fetchuser,async (req,res)=>{
+router.delete('/deletenote/:id',fetchuser,async (req,res)=>{
 
    
     try {
@@ -108,6 +109,8 @@ router.put('/deletenote/:id',fetchuser,async (req,res)=>{
     }
     let delnote = await Notes.findByIdAndDelete(req.params.id)
     res.json({"sucess":'sucess the note has been deleted', delnote:delnote})
+    console.log('note deleted');
+
         
     } catch (err) {
         console.error(err.message)
